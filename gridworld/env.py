@@ -1,6 +1,6 @@
 # ASCII-only. Basic 5x5 GridWorld treasure hunt environment.
 # API: reset() -> state_id ; step(action) -> (state_id, reward, done, info)
-# Action mapping: 0=Up, 1=Right, 2=Down, 3=Left, 4=Stay
+# Actions: 0=Up, 1=Right, 2=Down, 3=Left, 4=Stay
 
 from typing import Tuple, Dict, Any, Optional
 
@@ -45,7 +45,6 @@ class GridWorldEnv:
     # --- Public API ---
 
     def reset(self, seed: Optional[int] = None) -> int:
-        # seed kept for API compatibility; env is deterministic here
         self.pos = self.start
         self.has_treasure = False
         self.steps = 0
@@ -64,7 +63,7 @@ class GridWorldEnv:
         done = False
         info: Dict[str, Any] = {}
 
-        # block by boundary or wall
+        # boundary or wall blocks
         if not self._in_bounds((nx, ny)) or (nx, ny) in self.walls:
             nx, ny = old_pos
             reward += self.hit_cost
@@ -88,7 +87,7 @@ class GridWorldEnv:
             done = True
             info["success"] = True
 
-        # shaping (potential-based; difference guarantees policy invariance)
+        # shaping (potential difference)
         if self.shaping:
             reward += self._potential(self.pos) - old_potential
 
@@ -102,21 +101,20 @@ class GridWorldEnv:
     # --- Helpers ---
 
     def _encode_state(self) -> int:
-        # state_id in [0, 49] for 5x5 with carry bit
         x, y = self.pos
         return (1 if self.has_treasure else 0) * (self.W * self.H) + (y * self.W + x)
 
     def _move(self, pos: Tuple[int, int], action: Action) -> Tuple[int, int]:
         x, y = pos
-        if action == 0:   # Up
-            return x, y - 1
-        if action == 1:   # Right
-            return x + 1, y
-        if action == 2:   # Down
-            return x, y + 1
-        if action == 3:   # Left
-            return x - 1, y
-        return x, y       # Stay
+        if action == 0:
+            return x, y - 1  # Up
+        if action == 1:
+            return x + 1, y  # Right
+        if action == 2:
+            return x, y + 1  # Down
+        if action == 3:
+            return x - 1, y  # Left
+        return x, y          # Stay
 
     def _in_bounds(self, pos: Tuple[int, int]) -> bool:
         x, y = pos
@@ -126,7 +124,6 @@ class GridWorldEnv:
         return self.goal if self.has_treasure else self.treasure
 
     def _potential(self, pos: Tuple[int, int]) -> float:
-        # linear negative Manhattan distance scaled to ~0.05 per step improvement
         if not self.shaping:
             return 0.0
         tx, ty = self._target()
@@ -136,8 +133,6 @@ class GridWorldEnv:
 
     # --- Debug text render ---
 
-      # --- Debug text render ---
-    # --- Debug text render ---
     def render_text(self) -> str:
         grid = [["." for _ in range(self.W)] for _ in range(self.H)]
         for (wx, wy) in self.walls:
