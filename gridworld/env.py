@@ -137,8 +137,8 @@ class GridWorldEnv:
     # --- Debug text render ---
 
       # --- Debug text render ---
-   
-def render_text(self) -> str:
+    # --- Debug text render ---
+    def render_text(self) -> str:
         grid = [["." for _ in range(self.W)] for _ in range(self.H)]
         for (wx, wy) in self.walls:
             grid[wy][wx] = "#"
