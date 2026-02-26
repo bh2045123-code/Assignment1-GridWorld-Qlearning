@@ -136,7 +136,9 @@ class GridWorldEnv:
 
     # --- Debug text render ---
 
-    def render_text(self) -> str:
+      # --- Debug text render ---
+   
+def render_text(self) -> str:
         grid = [["." for _ in range(self.W)] for _ in range(self.H)]
         for (wx, wy) in self.walls:
             grid[wy][wx] = "#"
@@ -154,7 +156,7 @@ class GridWorldEnv:
         grid[y][x] = "*" if self.has_treasure else "P"
 
         lines = []
- for row in range(self.H):
+        for row in range(self.H):
             lines.append(" ".join(grid[row]))
         legend = "Legend: P=player, *=player+treasure, T=treasure, G=goal, #=wall, X=trap, S=start"
         return "\n".join(lines + [legend])
